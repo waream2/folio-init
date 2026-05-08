@@ -1,54 +1,54 @@
 # portfolio-init
 
-A Claude Code skill that clones the [portfolio-template](https://github.com/waream2/portfolio-template) into a new directory and hands you off to its `/onboard` flow.
+Spin up a personalized engineering portfolio in one command. Clones the [portfolio-template](https://github.com/waream2/portfolio-template) into a directory of your choice and installs the bundled `journal-post` skill globally so `/journal-post` works across all your projects.
 
-One command from "I want a portfolio" to a personalized site.
+## Two install paths
 
-## Install
+### With Claude Code (recommended)
+
+Install the skill once:
 
 ```sh
 git clone https://github.com/waream2/portfolio-init.git ~/.claude/skills/portfolio-init
 ```
 
-That's it. `/portfolio-init` will be available in any Claude Code session.
-
-## Usage
-
-```sh
-cd ~/Documents       # or wherever you want the new portfolio repo to live
-claude
-```
-
-Then in Claude Code:
+Then in any Claude Code session:
 
 ```
 /portfolio-init
 ```
 
-The skill asks for a directory name, clones the template into the current directory, and prints the next steps:
+The skill asks for a directory name and dispatches to `init.sh`.
 
+### Without Claude Code
+
+Run the script directly. Replace `<directory-name>` with whatever you want the portfolio repo to be called:
+
+```sh
+curl -fsSL https://raw.githubusercontent.com/waream2/portfolio-init/main/init.sh \
+  | bash -s -- <directory-name>
 ```
-cd <your-portfolio>
-claude
-/onboard
-```
 
-`/onboard` (a project-level skill that ships with the template) finishes the personalization — name, site title, tagline, GitHub handle, deployed URL.
+This clones the template into `<directory-name>` in your current directory and installs the journal-post skill at `~/.claude/skills/journal-post/` for when you set up Claude Code later. Same end state as the skill flow.
 
-## What it does, exactly
+## What `init.sh` does, exactly
 
-1. Verifies `git` is installed.
-2. Asks for a directory name (default: `portfolio`).
-3. Confirms the target directory doesn't already exist.
-4. Runs `git clone` over HTTPS to fetch the template.
-5. Installs the bundled `journal-post` skill at `~/.claude/skills/journal-post/` (asks before replacing if it already exists). This is what makes `/journal-post` available globally — so you can write up coding sessions from any repo, not just the portfolio one.
-6. Prints handoff instructions.
+1. Verifies `git` is available.
+2. Refuses if the target directory already exists.
+3. Clones the portfolio template.
+4. Installs the journal-post skill at `~/.claude/skills/journal-post/`:
+   - If a bundled copy is available locally (you ran the script via the skill), it `cp`s from there.
+   - If not (you ran via `curl | bash`), it fetches the SKILL.md from this repo over HTTPS.
+   - Skips silently if a journal-post skill already exists at that path.
+5. Prints handoff instructions.
 
-It does **not** run `npm install`, `cd` into the cloned repo, or modify files inside it. Project-level skills are scoped to the directory Claude Code launched from, so the handoff has to be a manual `cd` + relaunch — that's a Claude Code constraint, not a design choice.
+It does **not** run `npm install`, `cd` into the new repo, or modify files inside it. Project-level skills are scoped to the directory Claude Code launched from, so the handoff is a manual `cd` + relaunch — that's a Claude Code constraint, not a design choice.
 
-## What's in `bundled/`
+## Repo layout
 
-`bundled/journal-post/` is the journal-post skill payload, copied into your `~/.claude/skills/` on first run so `/journal-post` works across all your projects. The portfolio template also ships with a project-local copy as a fallback for users who clone manually without this skill.
+- `init.sh` — the setup script. Runs both via the skill (`bash <skill-path>/init.sh ...`) and standalone via `curl | bash`.
+- `SKILL.md` — the `/portfolio-init` skill definition. A thin wrapper that asks for the directory name and dispatches to `init.sh`.
+- `bundled/journal-post/SKILL.md` — payload copied into `~/.claude/skills/journal-post/` on install. Lets `/journal-post` work across all your projects, not just inside the portfolio repo. The portfolio template also ships with a project-local copy as a fallback for users who clone manually without this tooling.
 
 ## License
 

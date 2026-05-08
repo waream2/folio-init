@@ -1,75 +1,40 @@
 ---
 name: portfolio-init
-description: Clone the portfolio template into a new directory and install the journal-post skill globally. Asks for a directory name, runs git clone over HTTPS, copies the bundled journal-post skill into ~/.claude/skills/, then prints handoff steps to /onboard. Invoke with /portfolio-init from the parent directory you want the new portfolio to live in.
-allowed-tools: Bash(git clone *), Bash(ls *), Bash(pwd), Bash(test *), Bash(which git), Bash(mkdir *), Bash(cp *)
+description: Clone the portfolio template and install the journal-post skill globally. Asks for a directory name, then dispatches to ~/.claude/skills/portfolio-init/init.sh which handles the clone, the journal-post global install, and the handoff message. Invoke from the parent directory you want the new portfolio to live in.
+allowed-tools: Bash(bash *), Bash(pwd)
 ---
 
 # portfolio-init — spin up a new portfolio from the template
 
-The user has installed this skill globally (it lives at `~/.claude/skills/portfolio-init/`) and wants to start a fresh portfolio site without manually cloning. Your job, in order:
+The user has installed this skill globally (`~/.claude/skills/portfolio-init/`) and wants to start a fresh portfolio site. Your job: ask for a directory name, then dispatch to the bundled `init.sh` script. The script does the work; you handle the conversation.
 
-1. Clone the template into the directory the user wants.
-2. Install the bundled `journal-post` skill globally so it works across all their projects.
-3. Hand off to the cloned repo's `/onboard` flow.
+## Why a script
 
-## Site config
-
-Fill these in once when you set up this skill, then commit. The skill refuses to run while the placeholder is present — fail loudly with a clear message telling the maintainer to edit `SKILL.md`.
-
-```
-TEMPLATE_REPO_URL: https://github.com/waream2/portfolio-template.git
-```
+The mechanical steps — `git clone`, `mkdir`, `cp -R`, error handling — are deterministic and best executed by bash. This skill is a thin conversational front-end: collect one piece of input, run the script. The same script runs standalone via `curl | bash` for users without Claude Code, so behavior stays in lockstep across both install paths.
 
 ## Hard constraints
 
-- **You cannot run `/onboard` yourself.** Project-level skills are scoped to the directory Claude Code launched from. `/onboard` lives inside the cloned repo and is not available in this session. Your job ends at the handoff message.
-- **Do not `cd` and try to keep working in the cloned repo.** The session is in the wrong directory. Print the handoff and stop.
-- **Use HTTPS, not SSH.** Public template, no auth needed; SSH breaks for users without GitHub keys.
-- **Never overwrite an existing directory.** If the target name is taken, ask for a different one.
-- **Never silently overwrite an existing global skill.** If `~/.claude/skills/journal-post/` exists, ask before replacing.
+- **Don't run `/onboard` or `cd` and continue.** Project-level skills are scoped to the launching cwd. The new portfolio's `/onboard` is unreachable from this session. The script prints the handoff; let it stand and stop.
+- **Don't redo the script's work yourself.** No manual `git clone`, no manual `cp`, no manual error checks. The script is the source of truth. If it fails, surface the error and stop — do not improvise a recovery.
 
 ## Steps
 
-1. **Pre-flight.** Verify `git` is installed (`which git`). If not, tell the user to install git and stop. Verify `TEMPLATE_REPO_URL` above is filled in (not a placeholder); if it still contains `<fill in...>`, stop and tell the user this skill hasn't been configured yet.
+1. **Confirm cwd.** Run `pwd` and tell the user: "I'll clone into `<cwd>/<name>`. `cd` somewhere else and re-run if you want a different parent." State it; don't ask.
 
-2. **Confirm the parent directory.** Run `pwd`. Tell the user: "I'll clone into `<cwd>/<name>`. Want it somewhere else? `cd` there and re-run `/portfolio-init`." Don't ask — just state it. The user can interrupt if cwd is wrong.
+2. **Ask for the directory name** with AskUserQuestion. Default suggestion: `portfolio`. Encourage lowercase-with-dashes — it'll become the npm package name once `/onboard` runs.
 
-3. **Ask for a directory name.** Use AskUserQuestion. Default suggestion: `portfolio`. Encourage lowercase-with-dashes — the directory name becomes the npm package name once `/onboard` runs.
+3. **Run the script.** Invoke:
 
-4. **Check the target doesn't already exist.** `test -e <name> && echo exists`. If it exists, ask for a different name (or to abort). Do not clone over it.
-
-5. **Clone the template.** Run `git clone <TEMPLATE_REPO_URL> <name>`. If clone fails — network, bad URL, anything — surface the stderr verbatim and stop. Don't try to recover.
-
-6. **Install the journal-post skill globally.**
-   - Check `test -e ~/.claude/skills/journal-post`.
-   - If it exists, use AskUserQuestion to confirm whether to replace it. If the user says no, skip this step and continue to the handoff.
-   - If it doesn't exist (or the user said yes to replace):
-     ```bash
-     mkdir -p ~/.claude/skills/journal-post
-     cp -R ~/.claude/skills/portfolio-init/bundled/journal-post/. ~/.claude/skills/journal-post/
-     ```
-   - The bundled skill ships with a placeholder Site config block; `/onboard` will fill it in.
-
-7. **Hand off.** Print exactly this, with `<name>` substituted:
-
-   ```
-   Cloned to <cwd>/<name>.
-   Installed journal-post globally at ~/.claude/skills/journal-post/.
-
-   Next steps:
-     cd <name>
-     claude
-
-   Then in the new session, run /onboard to personalize the template
-   and fill in the journal-post site config.
+   ```bash
+   bash ~/.claude/skills/portfolio-init/init.sh <directory-name>
    ```
 
-   That's the whole output. Don't add summary, don't recommend `npm install` (onboard handles guidance), don't suggest opening files. The user just wants to get into their new repo.
+   Surface its stdout and stderr verbatim. The script handles every check (git installed, target exists, network failures, journal-post install) and prints its own handoff at the end.
 
-   If you skipped the journal-post install in step 6, omit the "Installed journal-post" line.
+4. **Stop after the script returns.** The script's handoff message is the final output. Add nothing — no summary, no extra suggestions, no "let me know if…".
 
 ## Don't
 
-- Don't run `npm install`.
+- Don't run `npm install`. The template's `/onboard` handles guidance.
 - Don't read or edit files inside the cloned repo.
-- Don't extend the conversation past the handoff. The next move is the user's.
+- Don't extend the conversation past the script output. The next move is the user's.
