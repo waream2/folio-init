@@ -1,19 +1,19 @@
 #!/usr/bin/env bash
 #
-# portfolio-init: clone the portfolio template and install the journal-post
+# folio-init: clone the /folio template and install the journal-post
 # skill globally.
 #
 # Usage:
 #   bash init.sh <directory-name>
-#   curl -fsSL https://raw.githubusercontent.com/waream2/portfolio-init/main/init.sh \
+#   curl -fsSL https://raw.githubusercontent.com/waream2/folio-init/main/init.sh \
 #     | bash -s -- <directory-name>
 
 set -euo pipefail
 
 TEMPLATE_REPO_URL="https://github.com/waream2/folio.git"
-JOURNAL_POST_RAW_URL="https://raw.githubusercontent.com/waream2/portfolio-init/main/bundled/journal-post/SKILL.md"
+JOURNAL_POST_RAW_URL="https://raw.githubusercontent.com/waream2/folio-init/main/bundled/journal-post/SKILL.md"
 SKILL_HOME="$HOME/.claude/skills"
-LOCAL_BUNDLED="$SKILL_HOME/portfolio-init/bundled/journal-post"
+LOCAL_BUNDLED="$SKILL_HOME/folio-init/bundled/journal-post"
 JOURNAL_POST_DIR="$SKILL_HOME/journal-post"
 
 err() {

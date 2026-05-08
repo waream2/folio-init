@@ -2,7 +2,7 @@
   <img src="assets/wordmark.svg" alt="/folio" height="56" />
 </p>
 
-<h1 align="center">portfolio-init</h1>
+<h1 align="center">folio-init</h1>
 
 <p align="center">
   <strong>Spin up a personalized engineering portfolio in one command.</strong>
@@ -25,13 +25,13 @@
 ### With Claude Code (recommended)
 
 ```sh
-git clone https://github.com/waream2/portfolio-init.git ~/.claude/skills/portfolio-init
+git clone https://github.com/waream2/folio-init.git ~/.claude/skills/folio-init
 ```
 
 Then in any Claude Code session:
 
 ```
-/portfolio-init
+/folio-init
 ```
 
 The skill asks for a directory name and dispatches to `init.sh`.
@@ -41,7 +41,7 @@ The skill asks for a directory name and dispatches to `init.sh`.
 Run the script directly. Replace `<directory-name>` with whatever you want the portfolio repo to be called:
 
 ```sh
-curl -fsSL https://raw.githubusercontent.com/waream2/portfolio-init/main/init.sh \
+curl -fsSL https://raw.githubusercontent.com/waream2/folio-init/main/init.sh \
   | bash -s -- <directory-name>
 ```
 
@@ -67,7 +67,7 @@ It does **not** run `npm install`, `cd` into the cloned repo, or modify files in
 | Path                              | What it is                                                                                                                                                                |
 | --------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | `init.sh`                         | The setup script. Runs via the skill (`bash <skill-path>/init.sh ...`) and standalone via `curl \| bash`.                                                                 |
-| `SKILL.md`                        | The `/portfolio-init` skill definition. A thin wrapper that asks for the directory name and dispatches to `init.sh`.                                                      |
+| `SKILL.md`                        | The `/folio-init` skill definition. A thin wrapper that asks for the directory name and dispatches to `init.sh`.                                                      |
 | `bundled/journal-post/SKILL.md`   | Payload copied into `~/.claude/skills/journal-post/` on install. Lets `/journal-post` work across all your projects, not just inside the portfolio repo.                  |
 | `assets/`                         | Logo SVGs used in this README.                                                                                                                                            |
 

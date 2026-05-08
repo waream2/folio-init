@@ -1,12 +1,12 @@
 ---
-name: portfolio-init
-description: Clone the /folio engineering portfolio template and install the journal-post skill globally. Asks for a directory name, then dispatches to ~/.claude/skills/portfolio-init/init.sh which handles the clone, the journal-post global install, and the handoff message. Invoke from the parent directory you want the new portfolio to live in.
+name: folio-init
+description: Clone the /folio engineering portfolio template and install the journal-post skill globally. Asks for a directory name, then dispatches to ~/.claude/skills/folio-init/init.sh which handles the clone, the journal-post global install, and the handoff message. Invoke from the parent directory you want the new portfolio to live in.
 allowed-tools: Bash(bash *), Bash(pwd)
 ---
 
-# portfolio-init — spin up a new portfolio from the template
+# folio-init — spin up a new portfolio from the template
 
-The user has installed this skill globally (`~/.claude/skills/portfolio-init/`) and wants to start a fresh portfolio site. Your job: ask for a directory name, then dispatch to the bundled `init.sh` script. The script does the work; you handle the conversation.
+The user has installed this skill globally (`~/.claude/skills/folio-init/`) and wants to start a fresh portfolio site. Your job: ask for a directory name, then dispatch to the bundled `init.sh` script. The script does the work; you handle the conversation.
 
 ## Why a script
 
@@ -26,7 +26,7 @@ The mechanical steps — `git clone`, `mkdir`, `cp -R`, error handling — are d
 3. **Run the script.** Invoke:
 
    ```bash
-   bash ~/.claude/skills/portfolio-init/init.sh <directory-name>
+   bash ~/.claude/skills/folio-init/init.sh <directory-name>
    ```
 
    Surface its stdout and stderr verbatim. The script handles every check (git installed, target exists, network failures, journal-post install) and prints its own handoff at the end.
