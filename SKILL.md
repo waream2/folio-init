@@ -1,12 +1,16 @@
 ---
 name: portfolio-init
-description: Clone the portfolio template into a new directory and hand off to its /onboard flow. Asks for a directory name, runs git clone over HTTPS, then prints the next steps. Invoke with /portfolio-init from the parent directory you want the new portfolio to live in.
-allowed-tools: Bash(git clone *), Bash(ls *), Bash(pwd), Bash(test *), Bash(which git)
+description: Clone the portfolio template into a new directory and install the journal-post skill globally. Asks for a directory name, runs git clone over HTTPS, copies the bundled journal-post skill into ~/.claude/skills/, then prints handoff steps to /onboard. Invoke with /portfolio-init from the parent directory you want the new portfolio to live in.
+allowed-tools: Bash(git clone *), Bash(ls *), Bash(pwd), Bash(test *), Bash(which git), Bash(mkdir *), Bash(cp *)
 ---
 
 # portfolio-init — spin up a new portfolio from the template
 
-The user has installed this skill globally (it lives at `~/.claude/skills/portfolio-init/`) and wants to start a fresh portfolio site without manually cloning. Your job: confirm where they want it, clone the template, and hand off to the cloned repo's `/onboard` flow with a clean message.
+The user has installed this skill globally (it lives at `~/.claude/skills/portfolio-init/`) and wants to start a fresh portfolio site without manually cloning. Your job, in order:
+
+1. Clone the template into the directory the user wants.
+2. Install the bundled `journal-post` skill globally so it works across all their projects.
+3. Hand off to the cloned repo's `/onboard` flow.
 
 ## Site config
 
@@ -22,6 +26,7 @@ TEMPLATE_REPO_URL: https://github.com/waream2/portfolio-template.git
 - **Do not `cd` and try to keep working in the cloned repo.** The session is in the wrong directory. Print the handoff and stop.
 - **Use HTTPS, not SSH.** Public template, no auth needed; SSH breaks for users without GitHub keys.
 - **Never overwrite an existing directory.** If the target name is taken, ask for a different one.
+- **Never silently overwrite an existing global skill.** If `~/.claude/skills/journal-post/` exists, ask before replacing.
 
 ## Steps
 
@@ -31,23 +36,37 @@ TEMPLATE_REPO_URL: https://github.com/waream2/portfolio-template.git
 
 3. **Ask for a directory name.** Use AskUserQuestion. Default suggestion: `portfolio`. Encourage lowercase-with-dashes — the directory name becomes the npm package name once `/onboard` runs.
 
-4. **Check it doesn't already exist.** `test -e <name> && echo exists`. If it exists, ask for a different name (or to abort). Do not clone over it.
+4. **Check the target doesn't already exist.** `test -e <name> && echo exists`. If it exists, ask for a different name (or to abort). Do not clone over it.
 
-5. **Clone.** Run `git clone <TEMPLATE_REPO_URL> <name>`. If clone fails — network, bad URL, anything — surface the stderr verbatim and stop. Don't try to recover.
+5. **Clone the template.** Run `git clone <TEMPLATE_REPO_URL> <name>`. If clone fails — network, bad URL, anything — surface the stderr verbatim and stop. Don't try to recover.
 
-6. **Hand off.** Print exactly this, with `<name>` substituted:
+6. **Install the journal-post skill globally.**
+   - Check `test -e ~/.claude/skills/journal-post`.
+   - If it exists, use AskUserQuestion to confirm whether to replace it. If the user says no, skip this step and continue to the handoff.
+   - If it doesn't exist (or the user said yes to replace):
+     ```bash
+     mkdir -p ~/.claude/skills/journal-post
+     cp -R ~/.claude/skills/portfolio-init/bundled/journal-post/. ~/.claude/skills/journal-post/
+     ```
+   - The bundled skill ships with a placeholder Site config block; `/onboard` will fill it in.
+
+7. **Hand off.** Print exactly this, with `<name>` substituted:
 
    ```
    Cloned to <cwd>/<name>.
+   Installed journal-post globally at ~/.claude/skills/journal-post/.
 
    Next steps:
      cd <name>
      claude
 
-   Then in the new session, run /onboard to personalize the template.
+   Then in the new session, run /onboard to personalize the template
+   and fill in the journal-post site config.
    ```
 
    That's the whole output. Don't add summary, don't recommend `npm install` (onboard handles guidance), don't suggest opening files. The user just wants to get into their new repo.
+
+   If you skipped the journal-post install in step 6, omit the "Installed journal-post" line.
 
 ## Don't
 

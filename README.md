@@ -39,11 +39,16 @@ claude
 
 1. Verifies `git` is installed.
 2. Asks for a directory name (default: `portfolio`).
-3. Confirms the directory doesn't already exist.
-4. Runs `git clone` over HTTPS.
-5. Prints handoff instructions.
+3. Confirms the target directory doesn't already exist.
+4. Runs `git clone` over HTTPS to fetch the template.
+5. Installs the bundled `journal-post` skill at `~/.claude/skills/journal-post/` (asks before replacing if it already exists). This is what makes `/journal-post` available globally — so you can write up coding sessions from any repo, not just the portfolio one.
+6. Prints handoff instructions.
 
-It does **not** run `npm install`, `cd` into the new repo, or modify files. Project-level skills are scoped to the directory Claude Code launched from, so the handoff has to be a manual `cd` + relaunch — that's a Claude Code constraint, not a design choice.
+It does **not** run `npm install`, `cd` into the cloned repo, or modify files inside it. Project-level skills are scoped to the directory Claude Code launched from, so the handoff has to be a manual `cd` + relaunch — that's a Claude Code constraint, not a design choice.
+
+## What's in `bundled/`
+
+`bundled/journal-post/` is the journal-post skill payload, copied into your `~/.claude/skills/` on first run so `/journal-post` works across all your projects. The portfolio template also ships with a project-local copy as a fallback for users who clone manually without this skill.
 
 ## License
 
