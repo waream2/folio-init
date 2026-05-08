@@ -10,7 +10,7 @@
 
 set -euo pipefail
 
-TEMPLATE_REPO_URL="https://github.com/waream2/portfolio-template.git"
+TEMPLATE_REPO_URL="https://github.com/waream2/folio.git"
 JOURNAL_POST_RAW_URL="https://raw.githubusercontent.com/waream2/portfolio-init/main/bundled/journal-post/SKILL.md"
 SKILL_HOME="$HOME/.claude/skills"
 LOCAL_BUNDLED="$SKILL_HOME/portfolio-init/bundled/journal-post"

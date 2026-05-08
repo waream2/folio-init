@@ -1,6 +1,6 @@
 ---
 name: portfolio-init
-description: Clone the portfolio template and install the journal-post skill globally. Asks for a directory name, then dispatches to ~/.claude/skills/portfolio-init/init.sh which handles the clone, the journal-post global install, and the handoff message. Invoke from the parent directory you want the new portfolio to live in.
+description: Clone the /folio engineering portfolio template and install the journal-post skill globally. Asks for a directory name, then dispatches to ~/.claude/skills/portfolio-init/init.sh which handles the clone, the journal-post global install, and the handoff message. Invoke from the parent directory you want the new portfolio to live in.
 allowed-tools: Bash(bash *), Bash(pwd)
 ---
 
