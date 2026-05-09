@@ -14,7 +14,7 @@ The mechanical steps — `git clone`, `mkdir`, `cp -R`, error handling — are d
 
 ## Hard constraints
 
-- **Don't run `/onboard` or `cd` and continue.** Project-level skills are scoped to the launching cwd. The new portfolio's `/onboard` is unreachable from this session. The script prints the handoff; let it stand and stop.
+- **Don't run `/onboard`, pass `--claude`, or `cd` and continue.** Project-level skills are scoped to the launching cwd. The new portfolio's `/onboard` is unreachable from this session. Starting a nested Claude session from inside this one can hang or confuse the flow. The script prints the handoff command, and you repeat that handoff once in normal chat so the user does not have to expand Bash output to see it.
 - **Don't redo the script's work yourself.** No manual `git clone`, no manual `cp`, no manual error checks. The script is the source of truth. If it fails, surface the error and stop — do not improvise a recovery.
 
 ## Steps
@@ -29,12 +29,23 @@ The mechanical steps — `git clone`, `mkdir`, `cp -R`, error handling — are d
    bash ~/.claude/skills/folio-init/init.sh <directory-name>
    ```
 
-   Surface its stdout and stderr verbatim. The script handles every check (git installed, target exists, network failures, journal-post install) and prints its own handoff at the end.
+   Do not pass `--claude` from this skill. Surface stdout and stderr verbatim. The script handles every check (git installed, target exists, network failures, journal-post install) and prints its own handoff at the end.
 
-4. **Stop after the script returns.** The script's handoff message is the final output. Add nothing — no summary, no extra suggestions, no "let me know if…".
+4. **After a successful script run, repeat the next command prominently.** Claude Code may collapse Bash output, so do not rely on the script output as the only visible handoff. Copy the exact `cd ... && claude` command from the script output and send one short final message:
+
+   ```text
+   Ready. Next command:
+
+   cd <absolute-path-to-new-repo> && claude
+
+   Then run /onboard in that new Claude session.
+   ```
+
+   If the script fails, surface the error and stop. Do not print a next command after a failure.
 
 ## Don't
 
 - Don't run `npm install`. The template's `/onboard` handles guidance.
+- Don't use the script's `--claude` option from inside Claude Code. It is only for direct terminal use.
 - Don't read or edit files inside the cloned repo.
-- Don't extend the conversation past the script output. The next move is the user's.
+- Don't extend the conversation beyond the single visible handoff message. The next move is the user's.
