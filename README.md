@@ -24,11 +24,21 @@
 
 ### With Claude Code (recommended)
 
+Run the installer:
+
+```sh
+curl -fsSL https://raw.githubusercontent.com/waream2/folio-init/main/install.sh | bash
+```
+
+It installs or updates the `/folio-init` skill, then prints the next steps.
+
+If you prefer to install manually:
+
 ```sh
 git clone https://github.com/waream2/folio-init.git ~/.claude/skills/folio-init
 ```
 
-Then in any Claude Code session:
+Then `cd` to the folder where you want the new portfolio repo to live, start Claude Code, and run:
 
 ```
 /folio-init
@@ -75,6 +85,7 @@ If you pass `--claude` from a real terminal, the script `cd`s into the new repo 
 
 | Path                              | What it is                                                                                                                                                                |
 | --------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `install.sh`                      | Installs or updates the `/folio-init` Claude Code skill globally, then prints the next steps.                                                                             |
 | `init.sh`                         | The setup script. Runs via the skill (`bash <skill-path>/init.sh ...`) and standalone via `curl \| bash`.                                                                 |
 | `SKILL.md`                        | The `/folio-init` skill definition. A thin wrapper that asks for the directory name and dispatches to `init.sh`.                                                      |
 | `bundled/journal-post/SKILL.md`   | Payload copied into `~/.claude/skills/journal-post/` on install. Lets `/journal-post` work across all your projects, not just inside the portfolio repo.                  |
